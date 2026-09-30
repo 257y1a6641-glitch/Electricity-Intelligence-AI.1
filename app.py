@@ -9,7 +9,12 @@ from flask import Flask, render_template, request, jsonify
 from demand_forecasting import forecaster
 from energy_allocation import allocate_energy, get_default_loads
 
-app = Flask(__name__)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static")
+)
 
 # Preload or train ML model on startup
 print("Initializing Demand Forecasting Model...")
