@@ -27,8 +27,8 @@ Version: 2.0.0
 import os
 import time
 import logging
-from functools import wraps
 from flask import Flask, render_template, request, jsonify, g
+from flask_compress import Compress
 from demand_forecasting import forecaster
 from energy_allocation import allocate_energy, get_default_loads
 
@@ -46,7 +46,15 @@ app = Flask(
     template_folder=os.path.join(BASE_DIR, "templates"),
     static_folder=os.path.join(BASE_DIR, "static")
 )
-app.config["JSON_SORT_KEYS"] = False
+app.config["JSON_SORT_KEYS"]      = False
+app.config["COMPRESS_MIMETYPES"]  = [
+    "application/json", "text/html", "text/css",
+    "text/javascript", "application/javascript"
+]
+app.config["COMPRESS_LEVEL"]      = 6      # gzip level 6 — good balance speed/size
+app.config["COMPRESS_MIN_SIZE"]   = 500    # compress responses ≥ 500 bytes
+app.config["COMPRESS_ALGORITHM"]  = ["br", "gzip", "deflate"]  # prefer Brotli
+Compress(app)                              # attach gzip/brotli to all responses
 
 # ─── In-Memory Cache ──────────────────────────────────────────────────────────
 _prediction_cache: dict = {}
